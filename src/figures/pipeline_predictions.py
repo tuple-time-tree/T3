@@ -39,7 +39,7 @@ def eval_benchmarks(results):
     names = [n for n, _ in results]
     reports = [r for _, r in results]
 
-    fig, axs = plt.subplots(1, 3, figsize=(6, 3))
+    fig, axs = plt.subplots(1, 3, figsize=(6, 2.5))
     x = np.arange(len(names))
     n = 0
     for ax, metric in ((axs[0], "p50"), (axs[1], "p90"), (axs[2], "Avg")):

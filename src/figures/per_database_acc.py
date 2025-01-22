@@ -12,10 +12,12 @@ from src.optimizer import optimize_per_tuple_tree_model
 
 def optimize_without_db() -> list[tuple[Model, list[Database], str]]:
     result = []
-    special_databases = DatabaseManager.get_databases(["tpcdsSf1", "tpcdsSf10", "tpchSf1", "tpchSf10"])
+    special_databases = DatabaseManager.get_databases(
+        ["tpcdsSf1", "tpcdsSf10", "tpcdsSf100", "tpchSf1", "tpchSf10", "tpchSf100"]
+    )
     for db, name in (
-        (DatabaseManager.get_databases(["tpchSf1", "tpchSf10"]), "TPC-H"),
-        (DatabaseManager.get_databases(["tpcdsSf1", "tpcdsSf10"]), "TPC-DS"),
+        (DatabaseManager.get_databases(["tpchSf1", "tpchSf10", "tpchSf100"]), "TPC-H"),
+        (DatabaseManager.get_databases(["tpcdsSf1", "tpcdsSf10", "tpcdsSf100"]), "TPC-DS"),
     ):
         current_train_databases = [x for x in DatabaseManager.get_all_databases() if x not in db]
         benchmarks = DataCollector.collect_benchmarks(current_train_databases, False)
@@ -50,7 +52,7 @@ def eval_dbs(dbs: list[tuple[Model, list[Database], str]]):
         p90s.append(np.quantile(q_errors, 0.9))
         avgs.append(np.average(q_errors))
 
-    plt.figure(figsize=(6, 3))
+    plt.figure(figsize=(6, 2.5))
 
     bar_width = 0.3
     x = np.arange(len(names))

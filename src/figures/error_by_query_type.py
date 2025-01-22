@@ -35,7 +35,7 @@ def get_error_by_query_hist(estimation_cache: QueryEstimationCache):
         p90s.append(np.quantile(q_errors, 0.9))
         avgs.append(np.average(q_errors))
 
-    plt.figure(figsize=(6, 3))
+    plt.figure(figsize=(6, 2.5))
 
     bar_width = 0.3
     x = np.arange(len(names))

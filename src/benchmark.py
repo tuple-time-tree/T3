@@ -15,6 +15,7 @@ from src.query_generation.aggregations import sample_group_by_query
 from src.query_generation.join_agg import generate_join_agg_query, generate_join_simple_agg_query
 from src.query_generation.join_graph import generate_join_query
 from src.query_generation.selections import SelectionFactory, sample_complex_selection_query
+from src.query_generation.window_function import WindowFunctionFactory
 from src.query_plan import QueryPlan
 from src.server import start_webserver_new
 
@@ -115,6 +116,7 @@ class Benchmarker:
     @staticmethod
     def get_category_dict(db: Database) -> dict[QueryCategory, Callable[[], str]]:
         selection_factory = SelectionFactory(db.schema)
+        window_factory = WindowFunctionFactory(db.schema)
         return {
             QueryCategory.select: lambda: selection_factory.sample_selection_query(),
             QueryCategory.join: lambda: generate_join_query(db.schema, False, False),
@@ -133,6 +135,7 @@ class Benchmarker:
             QueryCategory.complex_select_join: lambda: generate_join_query(db.schema, True, True),
             QueryCategory.complex_select_join_agg: lambda: generate_join_agg_query(db.schema, True, True),
             QueryCategory.complex_select_join_simple_agg: lambda: generate_join_simple_agg_query(db.schema, True, True),
+            QueryCategory.window: lambda: window_factory.get_query()
         }
 
     @staticmethod

@@ -287,6 +287,9 @@ class Schema:
     def simple_print(self) -> str:
         return f"{{\"name\":\"{self.name}\",\"tables\":[{','.join(t.simple_print() for t in self.tables.values())}]}}"
 
+    def __repr__(self) -> str:
+        return f"{self.name}"
+
 
 def load_schema(query: str):
     name_found = False

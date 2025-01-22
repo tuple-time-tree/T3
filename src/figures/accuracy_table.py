@@ -2,7 +2,7 @@ from src.train import optimize_all
 from src.data_collection import DataCollector
 from src.database_manager import DatabaseManager
 from src.evaluation import QueryEstimationCache, statistics_with_error_function, get_errors
-from src.figures.infra import write_latex_file
+from src.figures.infra import write_latex_file, set_figure_path
 from src.metrics import q_error
 from src.optimizer import QueryCategory
 
@@ -21,9 +21,9 @@ def latex_accuracy_table(reports: dict) -> str:
         result += current_line
     result += """  \\end{tabular}
   \\caption{Accuracy of T3 measured in q-error.
-    T3 is trained on 20 training database instances and has never seen any information about TPC-H data or queries.
+    T3 is trained on 20 training database instances and has never seen any information about TPC-DS data or queries.
     }
-  \\label{tbl_tpch_acc}
+  \\label{tbl_tpcds_acc}
 \\end{table}\n"""
     return result
 
@@ -36,13 +36,25 @@ def write_accuracy_table(estimation_cache: QueryEstimationCache):
             DataCollector.collect_benchmarks(DatabaseManager.get_train_databases(), predicted_cardinalities),
         ),
         (
-            "All TPC-H Test Queries",
+            "All TPC-DS Test Queries",
             DataCollector.collect_benchmarks(DatabaseManager.get_test_databases(), predicted_cardinalities),
         ),
         (
-            "TPC-H Benchmark Queries",
+            "TPC-DS Benchmark Queries",
             DataCollector.collect_benchmarks(
                 DatabaseManager.get_test_databases(), predicted_cardinalities, query_category=[QueryCategory.fixed]
+            ),
+        ),
+        (
+            "TPC-DS sf 100 Test Queries",
+            DataCollector.collect_benchmarks([DatabaseManager.get_database("tpcdsSf100")], predicted_cardinalities),
+        ),
+        (
+            "TPC-DS sf 100 Benchmark Queries",
+            DataCollector.collect_benchmarks(
+                [DatabaseManager.get_database("tpcdsSf100")],
+                predicted_cardinalities,
+                query_category=[QueryCategory.fixed],
             ),
         ),
     ]
@@ -54,11 +66,12 @@ def write_accuracy_table(estimation_cache: QueryEstimationCache):
 
     write_latex_file(
         latex_accuracy_table(report),
-        "tbl_tpch_acc",
+        "tbl_tpcds_acc",
     )
 
 
 def main():
+    set_figure_path("./figure_output")
     model = optimize_all()
     estimation_cache = QueryEstimationCache(model, False)
     write_accuracy_table(estimation_cache)

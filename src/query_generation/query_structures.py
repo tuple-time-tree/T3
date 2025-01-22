@@ -44,3 +44,10 @@ def get_random_columns(tables: list[BindingTable]) -> list[BindingColumn]:
     columns = random.sample(flattened_columns, n_columns)
     columns.sort(key=lambda x: x.table.binding_name)
     return columns
+
+
+def get_random_ir_columns(ir: IntermediateResult) -> list[BindingColumn]:
+    n_columns = min(len(ir.columns), geometric(p=0.2), 20)
+    columns = random.sample(ir.columns, n_columns)
+    columns.sort(key=lambda x: x.table.binding_name)
+    return columns

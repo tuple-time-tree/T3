@@ -30,6 +30,7 @@ class QueryCategory(AutoNumber):
     complex_select_join = ()
     complex_select_join_agg = ()
     complex_select_join_simple_agg = ()
+    window = ()
 
     def get_name(self):
         names = {
@@ -49,6 +50,7 @@ class QueryCategory(AutoNumber):
             QueryCategory.complex_select_join: "CSeJ",
             QueryCategory.complex_select_join_agg: "CSeJA",
             QueryCategory.complex_select_join_simple_agg: "CSeJSiA",
+            QueryCategory.window: "W",
         }
         return names[self]
 

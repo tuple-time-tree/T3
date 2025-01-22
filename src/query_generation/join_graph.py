@@ -145,7 +145,7 @@ def sample_join_graph(
         joins.append(new_join)
         assert get_cardinality(included_tables, joins) <= cardinality_limit * 1.01, (
             f"exceeded cardinality limit ({get_cardinality(included_tables, joins)})\n"
-            f"{joins_to_sql(JoinGraph(included_tables, joins, selections), schema)}"
+            f"{joins_to_sql(JoinGraph(included_tables, joins, selections, None), schema)}"
         )
     if use_selections:
         for t in included_tables:

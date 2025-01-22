@@ -2,13 +2,12 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 from src.data_collection import DataCollector
-from src.database import Database
 from src.database_manager import DatabaseManager
 from src.evaluation import QueryEstimationCache
 from src.figures.infra import setup_matplotlib_latex_font, get_figure_path, get_hex_colors, get_figure_format
 from src.metrics import q_error
 from src.model import Model
-from src.optimizer import optimize_per_tuple_tree_model, BenchmarkedQuery, QueryCategory
+from src.optimizer import optimize_per_tuple_tree_model
 from src.train import optimize_all
 
 
@@ -24,22 +23,6 @@ def get_card_models() -> list[Model]:
     for q in qs:
         result.append(optimize_per_tuple_tree_model(q))
     return result
-
-
-def get_card_eval_benchmarks() -> list[list[BenchmarkedQuery]]:
-    """
-    get two lists of benchmarks:
-    1. regular tpch eval queries
-    2. tpch eval queries with estimated cardinalities
-    """
-    return [
-        DataCollector.collect_benchmarks(
-            DatabaseManager.get_test_databases(), False, query_category=[QueryCategory.fixed]
-        ),
-        DataCollector.collect_benchmarks(
-            DatabaseManager.get_test_databases(), True, query_category=[QueryCategory.fixed]
-        ),
-    ]
 
 
 def eval_card_est(estimation_caches: list[QueryEstimationCache]):
@@ -63,7 +46,7 @@ def eval_card_est(estimation_caches: list[QueryEstimationCache]):
         p90s.append(np.quantile(q_errors, 0.9))
         avgs.append(np.average(q_errors))
 
-    fig, axs = plt.subplots(1, 3, figsize=(6, 3))
+    fig, axs = plt.subplots(1, 3, figsize=(6, 2.5))
     x = np.arange(len(names))
     n = 0
     for ax, values, metric in ((axs[0], p50s, "p50"), (axs[1], p90s, "p90"), (axs[2], avgs, "Avg")):

@@ -13,7 +13,7 @@ def get_zero_shot_exact_numbers():
 
 
 def get_zero_shot_pred_numbers():
-    return {"Avg": 1.8508, "p50": 1.2985, "p90": 3.6450}
+    return {"Avg": 1.7568, "p50": 1.3359, "p90": 2.9053}
 
 
 def get_test_numbers(predicted_cardinalities: bool):
@@ -42,7 +42,7 @@ def comparison_zero_shot_plot():
     names = ["T3", "Zero Shot"]
     reports = [t3, zero_shot]
 
-    fig, axs = plt.subplots(1, 3, figsize=(6, 3))
+    fig, axs = plt.subplots(1, 3, figsize=(6, 2.5))
     x = np.arange(len(names))
     n = 0
     for ax, metric in ((axs[0], "p50"), (axs[1], "p90"), (axs[2], "Avg")):

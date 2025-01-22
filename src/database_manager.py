@@ -16,14 +16,17 @@ def get_database_dict() -> dict[str, Database]:
             "tpchSf10": Database.get_database(
                 "tpchSf10", "benchmark_setup/schemata/01-tpchSf10-schema.sql", Path("queries/tpch")
             ),
-            # "tpchSf100": Database.get_database("tpchSf100",
-            #                                  "benchmark_setup/schemata/01-tpchSf100-schema.sql",
-            #                                  Path("queries/tpch")),
+            "tpchSf100": Database.get_database(
+                "tpchSf100", "benchmark_setup/schemata/01-tpchSf100-schema.sql", Path("queries/tpch")
+            ),
             "tpcdsSf1": Database.get_database(
                 "tpcdsSf1", "benchmark_setup/schemata/02-tpcdsSf1-schema.sql", Path("queries/tpcds")
             ),
             "tpcdsSf10": Database.get_database(
                 "tpcdsSf10", "benchmark_setup/schemata/02-tpcdsSf10-schema.sql", Path("queries/tpcds")
+            ),
+            "tpcdsSf100": Database.get_database(
+                "tpcdsSf100", "benchmark_setup/schemata/02-tpcdsSf100-schema.sql", Path("queries/tpcds")
             ),
             "job": Database.get_database("job", "benchmark_setup/schemata/03-job-schema.sql", Path("queries/job")),
             "airline": Database.get_database("airline", "benchmark_setup/schemata/04-airline-schema.sql"),
@@ -56,15 +59,16 @@ class DatabaseManager:
         return get_database_dict()[name]
 
     @staticmethod
-    def get_databases(names) -> list[Database]:
+    def get_databases(names: list[str]) -> list[Database]:
         return [get_database_dict()[name] for name in names]
 
     @staticmethod
     def get_train_databases() -> list[Database]:
         return DatabaseManager.get_databases(
             [
-                "tpcdsSf1",
-                "tpcdsSf10",
+                "tpchSf1",
+                "tpchSf10",
+                "tpchSf100",
                 "job",
                 "airline",
                 "ssb",
@@ -91,8 +95,9 @@ class DatabaseManager:
     def get_test_databases() -> list[Database]:
         return DatabaseManager.get_databases(
             [
-                "tpchSf1",
-                "tpchSf10",
+                "tpcdsSf1",
+                "tpcdsSf10",
+                "tpcdsSf100",
             ]
         )
 

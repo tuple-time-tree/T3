@@ -1,3 +1,4 @@
+import json
 from typing import Optional
 
 import numpy as np
@@ -349,9 +350,23 @@ class FeatureMapper:
         result = [p.get_pipeline_scan_cardinality() for p in query_plan.pipelines]
         return np.array(result)
 
+    @staticmethod
+    def get_portable_feature_encoding():
+        result = {}
+        for i, f in enumerate(QualifiedFeature.enumerate_features()):
+            if f.operator_type.name not in result:
+                result[f.operator_type.name] = {}
+            if f.operator_stage.name not in result[f.operator_type.name]:
+                result[f.operator_type.name][f.operator_stage.name] = {}
+            result[f.operator_type.name][f.operator_stage.name][f.feature.name] = i
+        result = json.dumps(result)
+        result= result.lower()
+        print(result)
+
 
 def main():
     print("\n".join(f"{i} {n}" for i, n in enumerate(FeatureMapper.get_names())))
+    FeatureMapper.get_portable_feature_encoding()
 
 
 if __name__ == "__main__":

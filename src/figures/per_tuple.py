@@ -5,7 +5,11 @@ from src.data_collection import DataCollector
 from src.database_manager import DatabaseManager
 from src.figures.infra import get_figure_path, setup_matplotlib_latex_font, get_hex_colors, get_figure_format
 from src.metrics import q_error
-from src.optimizer import optimize_per_tuple_tree_model, BenchmarkedQuery, QueryCategory, optimize_tree_model
+from src.optimizer import (
+    optimize_per_tuple_tree_model,
+    optimize_tree_model,
+    optimize_flat_tree_model,
+)
 
 
 def get_test_numbers(model, benchmarks, runtimes):
@@ -22,7 +26,8 @@ def benchmark_size_reports() -> list[tuple[str, dict]]:
 
     for model, name in (
         (optimize_per_tuple_tree_model(benchmarks), "T3 (Per Tuple)"),
-        (optimize_tree_model(benchmarks), "Per Pipeline"),
+        (optimize_tree_model(benchmarks), "Per Pipeline Vector"),
+        (optimize_flat_tree_model(benchmarks), "Flat Query Vector"),
     ):
         report = get_test_numbers(model, eval_queries, eval_runtimes)
         result.append((name, report))
@@ -36,7 +41,7 @@ def eval_benchmarks(results):
     names = [n for n, _ in results]
     reports = [r for _, r in results]
 
-    fig, axs = plt.subplots(1, 3, figsize=(6, 3))
+    fig, axs = plt.subplots(1, 3, figsize=(6, 2.5))
     x = np.arange(len(names))
     n = 0
     for ax, metric in ((axs[0], "p50"), (axs[1], "p90"), (axs[2], "Avg")):
@@ -45,8 +50,8 @@ def eval_benchmarks(results):
             names,
             values,
             edgecolor="black",
-            color=get_hex_colors(["my_blue", "my_red"]),
-            hatch=["", "//"],
+            color=get_hex_colors(["my_blue", "my_red", "my_green"]),
+            hatch=["", "//", "\\\\"],
         )
 
         ax.set_ylim(1, None)
@@ -73,7 +78,7 @@ def eval_benchmarks(results):
 
         n += 1
 
-    plt.savefig(f"{get_figure_path()}/per_tuple_model.{get_figure_format()}", bbox_inches="tight")
+    plt.savefig(f"{get_figure_path()}/ablation_study.{get_figure_format()}", bbox_inches="tight")
 
 
 def per_tuple_prediction_figure():

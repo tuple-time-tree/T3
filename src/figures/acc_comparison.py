@@ -4,29 +4,39 @@ from matplotlib import pyplot as plt
 from src.data_collection import DataCollector
 from src.database_manager import DatabaseManager
 from src.evaluation import QueryEstimationCache
+from src.figures.acc_comparison_zero_shot import get_zero_shot_pred_numbers
 from src.figures.infra import get_figure_path, setup_matplotlib_latex_font, get_hex_colors, get_figure_format
 from src.metrics import q_error
 from src.train import optimize_all
 
 
+def get_auto_wlm_pred_numbers():
+    return {"Avg": 171.8, "p50": 4.08, "p90": 135.7}
+
+
+def get_stage_pred_numbers():
+    return {"Avg": 54.57, "p50": 1.6, "p90": 19.0}
+
+
 def get_competitor_numbers():
     # the following results are taken from https://dl.acm.org/doi/pdf/10.1145/3626246.3653391
-    auto_wlm = {"Avg": 171.8, "p50": 4.08, "p90": 135.7}
-    stage = {"Avg": 54.57, "p50": 1.6, "p90": 19.0}
+    auto_wlm = get_auto_wlm_pred_numbers()
+    stage = get_stage_pred_numbers()
     # the following results are reproduced using https://github.com/DataManagementLab/zero-shot-cost-estimation
     # we are using job-full with estimated cardinalities
-    zero_shot = {"Avg": 1.7568, "p50": 1.3359, "p90": 2.9053}
+    zero_shot = get_zero_shot_pred_numbers()
     return auto_wlm, stage, zero_shot
 
 
 def get_test_numbers(estimation_cache: QueryEstimationCache):
     """
     For this comparison we use estimated cardinalities!
+    Also we only use the dataset TPC-DS sf100 but all queries
     :param estimation_cache:
     :return:
     """
 
-    benchmarks = DataCollector.collect_benchmarks(DatabaseManager.get_test_databases(), True)
+    benchmarks = DataCollector.collect_benchmarks(DatabaseManager.get_databases(["tpcdsSf100"]), True)
     runtimes = [b.get_total_runtime() for b in benchmarks]
     estimates = [estimation_cache.queries[q.name].estimated_time for q in benchmarks]
     q_errors = [q_error(e, r) for e, r in zip(estimates, runtimes)]
@@ -40,7 +50,7 @@ def comparison_plot(estimation_cache: QueryEstimationCache):
     names = ["T3", "Zero Shot", "Stage", "AutoWLM"]
     reports = [t3, zero_shot, stage, auto_wlm]
 
-    fig, axs = plt.subplots(1, 3, figsize=(6, 3))
+    fig, axs = plt.subplots(1, 3, figsize=(6, 2.5))
     x = np.arange(len(names))
     n = 0
     for ax, metric in ((axs[0], "p50"), (axs[1], "p90"), (axs[2], "Avg")):

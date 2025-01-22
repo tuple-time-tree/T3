@@ -11,35 +11,25 @@ from lleaves import lleaves
 from dp.BenchmarkDPResult import benchmark_dp_queries
 from dp.dp_to_sql import convert_all_dp_results_to_sql
 from src.benchmark_runner import benchmark
+from src.benchmark_setup import download_csvs, create_tpc_data, download_t3_file, load_csvs_to_db
 from src.evaluation import QueryEstimationCache
 from src.figures.acc_comparison import comparison_plot
 from src.figures.acc_comparison_zero_shot import comparison_zero_shot_plot
 from src.figures.accuracy_table import write_accuracy_table
+from src.figures.cardinality_degradation import make_card_degen_figure
 from src.figures.clean_benchmarks import clean_benchmark_figure
 from src.figures.error_by_query_type import get_error_by_query_hist
 from src.figures.error_histogram import get_error_histogram
 from src.figures.est_card_acc import eval_card_est
-from src.figures.infra import get_figure_path, set_figure_path, set_figure_format, get_figure_format, set_use_latex
+from src.figures.infra import get_figure_path, set_figure_path, set_figure_format, set_use_latex
 from src.figures.latency_accuracy import latency_acc_figure
 from src.figures.latency_scaling import latency_scaling_figure
 from src.figures.per_database_acc import create_per_db_figure
 from src.figures.per_tuple import per_tuple_prediction_figure
-from src.figures.pipeline_predictions import pipeline_prediction_figure
 from src.figures.query_runtimes import get_benchmark_variance
 from src.server import start_webserver_new, kill_webserver_new
 from src.train import optimize_all
 from src.util import rm_rec
-
-
-def download_t3_file(filename: str):
-    Path("downloaded_data").mkdir(parents=True, exist_ok=True)
-    if not Path(f"downloaded_data/{filename}").exists():
-        with requests.get(f"https://f003.backblazeb2.com/file/tuple-time-tree/{filename}", stream=True) as response:
-            response.raise_for_status()  # Raise an error for bad responses
-            with open(f"downloaded_data/{filename}", "wb") as f:
-                for chunk in response.iter_content(chunk_size=8192):
-                    if chunk:
-                        f.write(chunk)
 
 
 def download_bench_data():
@@ -70,16 +60,9 @@ def download_join_order_data():
 
 
 def create_db_files():
-    if not Path("benchmark_setup/db").exists():
-        print("Downloading Databases (24 GB)")
-        download_t3_file("db_files.tar.lz4")
-
-        print("Extracting Databases (70 GB)")
-        subprocess.run(
-            ["tar", "--use-compress-program=lz4", "-xvf", "downloaded_data/db_files.tar.lz4", "-C", "benchmark_setup"],
-            cwd=os.getcwd(),
-            stdout=subprocess.PIPE,
-        )
+    download_csvs()
+    create_tpc_data()
+    load_csvs_to_db()
 
 
 def extract_webserver():
@@ -220,12 +203,12 @@ def main():
     comparison_plot(pred_pred_eval)
     print("Creating accuracy comparison to zero shot figure (requires re-training)")
     comparison_zero_shot_plot()
-    print("Creating per pipeline vs single feature vec figure (requires re-training)")
-    pipeline_prediction_figure()
-    print("Creating per tuple vs whole pipeline prediction figure (requires re-training)")
+    print("Creating ablation study figure (requires re-training)")
     per_tuple_prediction_figure()
     print("Creating clean benchmark figure (requires re-training)")
     clean_benchmark_figure()
+    print("Creating cardinality degradation figure (might take a while)")
+    make_card_degen_figure()
 
     if run_cpp:
         print("Running join order microbenchmark")

@@ -56,10 +56,13 @@ The master script reproduces most results by default. However, some parts of the
   You can run this benchmark by adding the flag `-c`
 - **Join Order Microbenchmark Query Testing**: Benchmarking the generated queries with different join orderings requires to run the database system. This only works on x86_64 Linux.
   You can run this benchmark by adding the flag `-j`
-  This will download the db files (about 25 GB)
+  This will download (about 6 GB) and generate (about 300 GB) the csv data and load it into the database (about 500 GB).
+  Total required storage is about (800 GB).
 - **Reproducing the full database benchmarks**: Creating the full dataset of benchmarked queries requires to run the database system. This only works on x86_64 Linux.
   You can run this benchmark by adding the flag `-b`
-  This will download the db files (about 25 GB) and will take a while (about two hours on a 16 core machine)
+  This will download (about 6 GB) and generate (about 300 GB) the csv data and load it into the database (about 500 GB).
+  Total required storage is about (800 GB).
+  Benchmarks will take a while (about 8 hours on a 16 core machine)
 
 The best way to run these additional benchmarks is to use the provided Dockerfile. To reproduce all results run:
 
